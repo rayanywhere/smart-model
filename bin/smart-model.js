@@ -1,21 +1,51 @@
 #!/usr/bin/env node
 const opts = require('opts');
+const path = require('path');
 
-opts.parse([], [
-	{name: 'command', required: true},
-	{name: 'param', required: false}
+opts.parse([
+	{
+		short: 'c',
+		long: 'config-dir',
+		description: 'config directory',
+		value: true,
+		required: true
+	},
+	{
+		short: 'm',
+		long: 'models-dir',
+		description: 'models directory',
+		value: true,
+		required: true
+	},
+	{
+		short: 'e',
+		long: 'environment',
+		description: 'environment variable',
+		value: true,
+		required: true
+	},
+	{
+		short: 'a',
+		long: 'action',
+		description: 'action : diagnose|setup',
+		value: true,
+		required: true
+	}
 ], true);
 
+const params = {
+	configDir: path.resolve(opts.get('config-dir')),
+	modelsDir: path.resolve(opts.get('models-dir')),
+	environment: opts.get('environment')
+};
+
 try {
-	switch(opts.arg('command')) {
-		case 'init':
-			require('./init')();
-			break;
+	switch(opts.get('action')) {
 		case 'diagnose':
-			require('./diagnose')();
+			require('./diagnose')(params);
 			break;
 		case 'setup':
-			require('./setup')(opts.arg('param'));
+			require('./setup')(params);
 			break;
 		default:
 			opts.help();

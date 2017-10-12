@@ -1,13 +1,14 @@
 const fsx = require('fs-extra');
 const Helper = require('../../lib/helper');
-const helper = new Helper(process.cwd());
 const mysql = require('mysql2/promise');
 
-module.exports = async (env) => {
+module.exports = async (param) => {
     try {
-        const config = helper.config[env];
+        const helper = new Helper(param.modelsDir, param.configDir);
+        
+        const config = helper.config[param.environment];
         if (config === undefined) {
-            throw new Error(`no such env(${env})`);
+            throw new Error(`no such environment(${param.environment})`);
         }
         const connection = await mysql.createConnection({
             host: config.host,
