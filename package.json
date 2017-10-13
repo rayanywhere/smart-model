@@ -1,6 +1,6 @@
 {
   "name": "smart-model",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "a smart model middleware",
   "main": "index.js",
   "bin": {
@@ -29,6 +29,7 @@
     "fs-extra": "^4.0.2",
     "klaw-sync": "^3.0.0",
     "mysql2": "^1.4.2",
-    "opts": "^1.2.6"
+    "opts": "^1.2.6",
+    "sqlstring": "^2.3.0"
   }
 }

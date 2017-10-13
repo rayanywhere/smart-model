@@ -4,27 +4,26 @@ const mysql = require('mysql2/promise');
 
 module.exports = async (param) => {
     try {
-        const helper = new Helper(param.modelsDir, param.configDir);
+        const helper = new Helper(param.environment, param.modelsDir, param.configDir);
         
-        const config = helper.config[param.environment];
-        if (config === undefined) {
-            throw new Error(`no such environment(${param.environment})`);
+        if (helper.config === undefined) {
+            throw new Error(`no config of environment(${param.environment})`);
         }
         const connection = await mysql.createConnection({
-            host: config.host,
-            port: config.port,
-            user: config.user,
-            password: config.password
+            host: helper.config.host,
+            port: helper.config.port,
+            user: helper.config.user,
+            password: helper.config.password
         });
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS ${config.database}`);
+        await connection.execute(`CREATE DATABASE IF NOT EXISTS ${helper.config.database}`);
 
         for (let name of helper.models) {
             const {current, obsolete} = helper.model(name);
             if (obsolete !== undefined) {
-                await require('./upgrade')(connection, config.database, `t_${name.replace(/\./g, '_')}`, current, obsolete);
+                await require('./upgrade')(connection, helper.config.database, `t_${name.replace(/\./g, '_')}`, current, obsolete);
             }
             else {
-                await require('./create')(connection, config.database, `t_${name.replace(/\./g, '_')}`, current);
+                await require('./create')(connection, helper.config.database, `t_${name.replace(/\./g, '_')}`, current);
             }
         }
 

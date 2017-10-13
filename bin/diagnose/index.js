@@ -3,7 +3,7 @@ const ajv = new Ajv();
 const Helper = require('../../lib/helper');
 
 module.exports = (param) => {
-    const helper = new Helper(param.modelsDir, param.configDir); 
+    const helper = new Helper(param.environment, param.modelsDir, param.configDir); 
     if (!ajv.validate({
         type: "object",
         properties: {
@@ -15,7 +15,7 @@ module.exports = (param) => {
         },
         additionalProperties: false,
         required: ["host", "port", "user", "password", "database"]
-    }, helper.config[param.environment])) {
+    }, helper.config)) {
         throw new Error(`bad config file, details: ${ajv.errorsText()}`);
     }
 
