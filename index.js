@@ -7,6 +7,18 @@ const Helper = require('./lib/helper');
 let helper = undefined;
 
 module.exports = class {
+    static get Ops() {
+        return {
+            EQ: '=',
+            GT: '>',
+            GE: '>=',
+            LT: '<',
+            LE: '<=',
+            NE: '!=',
+            LIKE: 'like'
+        }
+    }
+
     static get Logic() {
         return {
             not: require('./src/logic/not'),

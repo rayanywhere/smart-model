@@ -5,18 +5,10 @@ SmartModel.setup('dev', `${__dirname}/models`, `${__dirname}/config`);
 
 (async () => {
     try {
-        await SmartModel.insert('user', {name:'ray'}).run();
+        await SmartModel.insert('user', {name:'ray', id: '1001'}).run();
 
         let counts = await SmartModel.count('user').where(
-            Logic.and(
-                [
-                    Logic.statement('name', '=', 'ray'),
-                    Logic.or([
-                        Logic.statement('id', '=', '123123'),
-                        Logic.statement('name', '=', 'rrsda')
-                    ])
-                ]
-            )
+               Logic.statement('name', SmartModel.Ops.LIKE, '%ay%'),
         ).run();
         console.log(counts);
 
