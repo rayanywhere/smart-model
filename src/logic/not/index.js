@@ -11,6 +11,10 @@ class LogicOr extends Logic {
     toSql() {
         return `(NOT ${this._item.toSql()})`;
     }
+
+    toParams() {
+        return this._item.toParams();
+    }
 }
 
 module.exports = (item) => {

@@ -14,6 +14,10 @@ class LogicOr extends Logic {
     toSql() {
         return `(${this._items.map(item => item.toSql()).join(' OR ')})`;
     }
+
+    toParams() {
+        return this._items.reduce((acc, item) => {return acc.push(item.toParams())}, []);
+    }
 }
 
 module.exports = (items) => {

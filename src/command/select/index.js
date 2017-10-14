@@ -1,4 +1,3 @@
-const sqlstring = require('sqlstring');
 const Command = require('../');
 module.exports = class extends Command {
     constructor(helper, name, fields) {
@@ -30,19 +29,30 @@ module.exports = class extends Command {
 
     async run() {
         let sql = 'SELECT ' + this._fields.map(field => `\`${field}\``).join(',') + ` FROM ${this._table}`;
+        let params = [];
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();
+            params = params.concat(this._logic.toParams());
         }
         if (this._sorts !== undefined) {
             sql += ' ORDER BY ' + this._sorts.map(sort => `\`${sort.field}\` ${sort.order}`).join(',');
         }
         if(this._range !== undefined) {
-            sql += ` LIMIT ${sqlstring.escape(this._range.offset)},${sqlstring.escape(this._range.number)}`;
+            sql += ` LIMIT ?,?`;
+            params = params.concat([this._range.offset, this._range.number]);
         }
 
         let connection = await this._getConnection();
-        const [rows] = await connection.execute(sql);
-        this._releaseConnection(connection);
-        return rows;
+        let result = undefined;
+        try {
+            result = await connection.execute(sql, params);
+        }
+        finally {
+            this._releaseConnection(connection);
+        }
+        if (result === undefined) {
+            throw new Error(`sql query error, ${sql} with params=${JSON.stringify(params)}`);
+        }
+        return result[0];
     }
 }

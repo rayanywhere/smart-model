@@ -1,4 +1,3 @@
-const sqlstring = require('sqlstring');
 const Command = require('../');
 module.exports = class extends Command {
     constructor(helper, name, pairs) {
@@ -20,16 +19,27 @@ module.exports = class extends Command {
     }
 
     async run() {
-        let sql = `UPDATE ${this._table} SET ` + Object.entries(this._pairs).map(([field, value]) => `\`${field}\`=${sqlstring.escape(value)}`).join(',');
+        let sql = `UPDATE ${this._table} SET ` + Object.keys(this._pairs).map(field => `\`${field}\`=?`).join(',');
+        let params = Object.values(this._pairs);
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();
+            params = params.concat(this._logic.toParams());
         }
         if(this._number !== undefined) {
-            sql += ` LIMIT ${sqlstring.escape(this._number)}`;
+            sql += ` LIMIT ?`;
+            params = params.concat(this._number);
         }
 
         let connection = await this._getConnection();
-        await connection.execute(sql);
-        this._releaseConnection(connection);
+        let result = undefined;
+        try {
+            result = await connection.execute(sql, params);
+        }
+        finally {
+            this._releaseConnection(connection);
+        }
+        if (result === undefined) {
+            throw new Error(`sql query error, ${sql} with params=${JSON.stringify(params)}`);
+        }
     }
 }

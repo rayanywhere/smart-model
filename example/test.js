@@ -5,7 +5,7 @@ SmartModel.setup('dev', `${__dirname}/models`, `${__dirname}/config`);
 
 (async () => {
     try {
-        await SmartModel.insert('user', {name:'ray', id: '1001'}).run();
+        await SmartModel.insert('user', {name:'ray', id: '1003'}).run();
 
         let counts = await SmartModel.count('user').where(
                Logic.statement('name', SmartModel.Ops.LIKE, '%ay%'),

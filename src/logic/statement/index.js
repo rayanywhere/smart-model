@@ -12,7 +12,11 @@ class LogicStatement extends Logic {
     }
 
     toSql() {
-        return `(\`${this._field}\`${this._op}${sqlstring.escape(this._value)})`;
+        return `(\`${this._field}\`${this._op}?)`;
+    }
+
+    toParams() {
+        return this._value;
     }
 }
 
