@@ -10,11 +10,16 @@ module.exports = class extends Command {
         return this;
     }
 
-    run() {
-        let sql = `SELECT count(*) FROM ${this._table}`;
+    async run() {
+        let sql = `SELECT count(*) as cnt FROM ${this._table}`;
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();
         }
-        console.log(sql);
+        
+        let connection = await this._getConnection();
+        const [rows] = await connection.execute(sql);
+        this._releaseConnection(connection);
+
+        return parseInt(rows[0]['cnt']);
     }
 }

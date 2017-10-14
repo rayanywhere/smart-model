@@ -7,8 +7,11 @@ module.exports = class extends Command {
         this._pairs = pairs;
     }
 
-    run() {
+    async run() {
         let sql = `INSERT INTO ${this._table} SET ` + Object.entries(this._pairs).map(([field, value]) => `\`${field}\`=${sqlstring.escape(value)}`).join(',');
-        console.log(sql);
+
+        let connection = await this._getConnection();
+        await connection.execute(sql);
+        this._releaseConnection(connection);
     }
 }

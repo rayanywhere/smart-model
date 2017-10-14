@@ -19,7 +19,7 @@ module.exports = class extends Command {
         return this;
     }
 
-    run() {
+    async run() {
         let sql = `UPDATE ${this._table} SET ` + Object.entries(this._pairs).map(([field, value]) => `\`${field}\`=${sqlstring.escape(value)}`).join(',');
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();
@@ -27,6 +27,9 @@ module.exports = class extends Command {
         if(this._number !== undefined) {
             sql += ` LIMIT ${sqlstring.escape(this._number)}`;
         }
-        console.log(sql);
+
+        let connection = await this._getConnection();
+        await connection.execute(sql);
+        this._releaseConnection(connection);
     }
 }

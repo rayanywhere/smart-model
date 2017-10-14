@@ -28,7 +28,7 @@ module.exports = class extends Command {
         return this;
     }
 
-    run() {
+    async run() {
         let sql = 'SELECT ' + this._fields.map(field => `\`${field}\``).join(',') + ` FROM ${this._table}`;
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();
@@ -39,6 +39,10 @@ module.exports = class extends Command {
         if(this._range !== undefined) {
             sql += ` LIMIT ${sqlstring.escape(this._range.offset)},${sqlstring.escape(this._range.number)}`;
         }
-        console.log(sql);
+
+        let connection = await this._getConnection();
+        const [rows] = await connection.execute(sql);
+        this._releaseConnection(connection);
+        return rows;
     }
 }
