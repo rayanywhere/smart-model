@@ -1,8 +1,10 @@
 const Command = require('../');
 module.exports = class extends Command {
-    constructor(helper, name, fields) {
+    constructor(helper, name, fields = undefined) {
         super(helper, name);
-        this._validateFields(fields);
+        if (fields !== undefined) {
+           this._validateFields(fields);
+        }
         this._fields = fields;
         this._logic = undefined;
         this._range = undefined;
@@ -28,7 +30,7 @@ module.exports = class extends Command {
     }
 
     async run() {
-        let sql = 'SELECT ' + this._fields.map(field => `\`${field}\``).join(',') + ` FROM ${this._table}`;
+        let sql = 'SELECT ' + (this._fields === undefined ? '*' : this._fields.map(field => `\`${field}\``).join(',')) + ` FROM ${this._table}`;
         let params = [];
         if(this._logic !== undefined) {
             sql += ' WHERE ' + this._logic.toSql();

@@ -16,7 +16,7 @@ class LogicOr extends Logic {
     }
 
     toParams() {
-        return this._items.reduce((acc, item) => {return acc.push(item.toParams())}, []);
+				return this._items.reduce((acc, item) => acc.concat(item.toParams()), []);
     }
 }
 
