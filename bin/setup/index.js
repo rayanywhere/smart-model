@@ -18,13 +18,33 @@ module.exports = async (param) => {
         await connection.execute(`CREATE DATABASE IF NOT EXISTS ${helper.config.database}`);
 
         for (let name of helper.models) {
-            const {current, obsolete} = helper.model(name);
-            if (obsolete !== undefined) {
-                await require('./upgrade')(connection, helper.config.database, `t_${name.replace(/\./g, '_')}`, current, obsolete);
-            }
-            else {
-                await require('./create')(connection, helper.config.database, `t_${name.replace(/\./g, '_')}`, current);
-            }
+            const {current} = helper.model(name);
+
+            let sql = '';
+            Object.entries(current).forEach(([field, desc]) => {
+                sql += sql.length > 0 ? `,\`${field}\`` : `\`${field}\``;
+                switch(desc.type.toLowerCase()) {
+                    case 'string':
+                        sql += ` VARCHAR(${desc.length}) NOT NULL DEFAULT '${desc.default}'`;
+                        break;
+                    case 'integer':
+                        sql += ` INTEGER NOT NULL DEFAULT ${desc.default}`;
+                        break;
+                }
+            });
+            Object.entries(current).forEach(([field, desc]) => {
+                switch (desc.index) {
+                    case 'unique':
+                        sql += `,UNIQUE INDEX(\`${field}\`)`;
+                        break;
+                    case 'ordinary':
+                        sql += `,INDEX(\`${field}\`)`;
+                        break;
+                }
+            })
+
+            sql = `CREATE TABLE IF NOT EXISTS ${helper.config.database}.t_${name.replace(/\./g, '_')}(${sql})`;
+            await connection.execute(sql);
         }
 
         connection.end();

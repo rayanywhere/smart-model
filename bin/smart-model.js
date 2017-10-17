@@ -27,7 +27,7 @@ opts.parse([
 	{
 		short: 'a',
 		long: 'action',
-		description: 'action : diagnose|setup',
+		description: 'action : diagnose|setup|upgrade',
 		value: true,
 		required: true
 	}
@@ -46,6 +46,9 @@ try {
 			break;
 		case 'setup':
 			require('./setup')(params);
+			break;
+		case 'upgrade':
+			require('./upgrade')(params);
 			break;
 		default:
 			opts.help();

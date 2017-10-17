@@ -9,5 +9,9 @@ module.exports = {
 		type: "string",
 		length: 30,
 		default: ""
+	},
+	sex: {
+		type: "integer",
+		default: 0
 	}
 }
