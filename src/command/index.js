@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise')
+const mysql = require('mysql')
 
 module.exports = class {
     constructor(helper, name) {
@@ -11,18 +11,25 @@ module.exports = class {
         throw new Error('run is supposed to be implemented by subclass');    
     }
 
-    _getConnection() {
-        return mysql.createConnection({
+    _execute(sql, params) {
+        let connection = mysql.createConnection({
             host: this._helper.config.host,
             port: this._helper.config.port,
             user: this._helper.config.user,
             password: this._helper.config.password,
             database: this._helper.config.database
         });
-    }
 
-    _releaseConnection(connection) {
-        connection.end();
+        return new Promise((resolve, reject) => {
+            connection.query(sql, params, function (error, results, fields) {
+                connection.end();
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(results);
+            });
+        });
     }
 
     _validateFields(fields) {

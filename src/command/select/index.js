@@ -44,17 +44,6 @@ module.exports = class extends Command {
             params = params.concat([this._range.offset, this._range.number]);
         }
 
-        let connection = await this._getConnection();
-        let result = undefined;
-        try {
-            result = await connection.execute(sql, params);
-        }
-        finally {
-            this._releaseConnection(connection);
-        }
-        if (result === undefined) {
-            throw new Error(`sql query error, ${sql} with params=${JSON.stringify(params)}`);
-        }
-        return result[0];
+        return await this._execute(sql, params);
     }
 }

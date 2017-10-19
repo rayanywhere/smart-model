@@ -1,6 +1,19 @@
 const fsx = require('fs-extra');
 const Helper = require('../../lib/helper');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql');
+
+function executeSql(connection, sql) {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, (error) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve();
+        });
+    });
+}
 
 function addFieldSql(database, table, field, desc) {
     let sql = `ALTER TABLE ${database}.${table} ADD COLUMN \`${field}\``;
@@ -40,7 +53,7 @@ module.exports = async (param) => {
             user: helper.config.user,
             password: helper.config.password
         });
-        await connection.execute(`CREATE DATABASE IF NOT EXISTS ${helper.config.database}`);
+        await executeSql(connection, `CREATE DATABASE IF NOT EXISTS ${helper.config.database}`);
 
         for (let name of helper.models) {
             const {current, obsolete} = helper.model(name);
@@ -61,7 +74,7 @@ module.exports = async (param) => {
 			    });
 
 			    for (let sql of sqls) {
-			        await connection.execute(sql);
+                    await executeSql(connection, sql);
 			    }
             }
         }

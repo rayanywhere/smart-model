@@ -5,7 +5,7 @@ const sqlstring = require('sqlstring');
 class LogicStatement extends Logic {
     constructor(field, op, value) {
         super();
-        assert(typeof field === 'string' && typeof op === 'string', 'bad statement');
+        assert(typeof field === 'string' && typeof op === 'string' && (typeof value === 'string' || typeof value === 'number'), 'bad statement');
         this._field = field;
         this._op = op;
         this._value = value;

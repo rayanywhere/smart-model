@@ -18,17 +18,10 @@ module.exports = class extends Command {
             params = params.concat(this._logic.toParams());
         }
         
-        let connection = await this._getConnection();
-        let result = undefined;
-        try {
-            result = await connection.execute(sql, params);
+        let results = await this._execute(sql, params);
+        if (results.length < 1) {
+            throw new Error('error when executing COUNT sql');
         }
-        finally {
-            this._releaseConnection(connection);
-        }
-        if (result === undefined) {
-            throw new Error(`sql query error, ${sql} with params=${JSON.stringify(params)}`);
-        }
-        return parseInt(result[0][0]['cnt']);
+        return parseInt(results[0]['cnt']);
     }
 }

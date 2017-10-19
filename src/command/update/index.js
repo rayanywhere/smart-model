@@ -30,16 +30,6 @@ module.exports = class extends Command {
             params = params.concat(this._number);
         }
 
-        let connection = await this._getConnection();
-        let result = undefined;
-        try {
-            result = await connection.execute(sql, params);
-        }
-        finally {
-            this._releaseConnection(connection);
-        }
-        if (result === undefined) {
-            throw new Error(`sql query error, ${sql} with params=${JSON.stringify(params)}`);
-        }
+        return await this._execute(sql, params);
     }
 }
