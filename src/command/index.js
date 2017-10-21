@@ -48,15 +48,15 @@ module.exports = class {
             switch(fieldConfig.type) {
                 case 'string':
                     if (typeof value !== 'string') {
-                        throw new Error(`expect value of field(${field}) to be a string`);
+                        throw new Error(`expect value of field(${field}) of table(${this._table}) to be a string`);
                     }
                     if (value.length > fieldConfig.length) {
-                        throw new Error(`string too long in field(${field})`);
+                        throw new Error(`string too long in field(${field}) of table(${this._table})`);
                     }
                     break;
                 case 'integer':
                     if (!Number.isInteger(value)) {
-                        throw new Error(`expect value of field(${field}) to be an integer`);
+                        throw new Error(`expect value of field(${field}) of table(${this._table}) to be an integer`);
                     }
                     break;
             }
