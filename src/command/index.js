@@ -36,7 +36,7 @@ module.exports = class {
         const allFields = new Set(Object.keys(this._model));
         fields.forEach(field => {
             if (!allFields.has(field)) {
-                throw new Error(`field(${field}) is not in specification`);
+                throw new Error(`field(${field}) is not in specification of table(${this._table})`);
             }
         });
     }

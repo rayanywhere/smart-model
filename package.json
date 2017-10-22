@@ -1,6 +1,6 @@
 {
   "name": "smart-model",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "a smart model middleware",
   "main": "index.js",
   "bin": {
