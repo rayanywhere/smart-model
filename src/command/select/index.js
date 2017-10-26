@@ -60,7 +60,7 @@ module.exports = class extends Command {
         return rows.map(row => {
             let formattedRow = {};
             for (let [rawfield, value] of Object.entries(row)) {
-                const parts = rawfield.match(/^(.+?)\^([^_]+)$/);
+                const parts = rawfield.match(/^(.+?)\^([^\^]+)$/);
                 assert(parts instanceof Array, 'internal error, cannot parse field');
                 const name = parts[1];
                 const field = parts[2];
