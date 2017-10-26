@@ -31,11 +31,11 @@ module.exports = class extends Command {
         //step 1. prepare fields
         let fields = [];
         for (let field of Object.keys(this._model)) {
-            fields.push(`\`${this._name}\`.\`${field}\` as \`${this._name}_${field}\``);
+            fields.push(`\`${this._name}\`.\`${field}\` as \`${this._name}^${field}\``);
         }
         if (this._join !== undefined) {
             for (let field of Object.keys(this._join.model)) {
-                fields.push(`\`${this._join.name}\`.\`${field}\` as \`${this._join.name}_${field}\``);
+                fields.push(`\`${this._join.name}\`.\`${field}\` as \`${this._join.name}^${field}\``);
             }
         }
 
@@ -60,7 +60,7 @@ module.exports = class extends Command {
         return rows.map(row => {
             let formattedRow = {};
             for (let [rawfield, value] of Object.entries(row)) {
-                const parts = rawfield.match(/^(.+?)_([^_]+)$/);
+                const parts = rawfield.match(/^(.+?)\^([^_]+)$/);
                 assert(parts instanceof Array, 'internal error, cannot parse field');
                 const name = parts[1];
                 const field = parts[2];
