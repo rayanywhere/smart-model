@@ -1,5 +1,7 @@
 const assert = require('assert');
 const Command = require('../');
+const Logic = require('../../logic');
+
 module.exports = class extends Command {
     where(logic) {
         assert(logic instanceof Logic, 'expect param to be an instance of Logic class');

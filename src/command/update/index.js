@@ -1,5 +1,7 @@
 const assert = require('assert');
 const Command = require('../');
+const Logic = require('../../logic');
+
 module.exports = class extends Command {
     data(data) {
         assert(typeof data === 'object', 'expect data to be an object');  
