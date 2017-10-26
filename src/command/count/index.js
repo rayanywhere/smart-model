@@ -15,7 +15,7 @@ module.exports = class extends Command {
     }
 
     async run() {
-        this._sql = `SELECT count(*) as cnt FROM ${this._name}`;
+        this._sql = `SELECT count(*) as cnt FROM \`${this._name}\``;
         if (this._join !== undefined) {
             this._parseJoin(this._join);
         }

@@ -14,7 +14,7 @@ module.exports = class extends Command {
     }
 
     async run() {
-        this._sql = `DELETE FROM ${this._name}`;
+        this._sql = `DELETE FROM \`${this._name}\``;
         if(this._logic !== undefined) {
             this._parseLogic(this._logic);
         }

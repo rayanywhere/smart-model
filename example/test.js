@@ -13,10 +13,10 @@ SmartModel.setup(`${__dirname}/models`, `${__dirname}/config`);
         ).run();
         console.log(counts);
 
-        let records = await SmartModel.select('user').join('user_statistic', 'left', 'id').where(
+        let [row] = await SmartModel.select('user').join('user_statistic', 'left', 'id').where(
             Logic.statement('user.name', '=', 'ray')
         ).range(0, 20).run();
-        console.log(records);
+        console.log(row);
         
         await SmartModel.update('user').data({name: 'tyson'}).limit(20).run();
         

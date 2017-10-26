@@ -31,16 +31,16 @@ module.exports = class extends Command {
         //step 1. prepare fields
         let fields = [];
         for (let field of Object.keys(this._model)) {
-            fields.push(`${this._name}.${field} as ${this._name}_${field}`);
+            fields.push(`\`${this._name}\`.\`${field}\` as \`${this._name}_${field}\``);
         }
         if (this._join !== undefined) {
             for (let field of Object.keys(this._join.model)) {
-                fields.push(`${this._join.name}.${field} as ${this._join.name}_${field}`);
+                fields.push(`\`${this._join.name}\`.\`${field}\` as \`${this._join.name}_${field}\``);
             }
         }
 
         //step 2. build & run query
-        this._sql = `SELECT ${fields.join(',')} FROM ${this._name}`;
+        this._sql = `SELECT ${fields.join(',')} FROM \`${this._name}\``;
         if (this._join !== undefined) {
             this._parseJoin(this._join);
         }
