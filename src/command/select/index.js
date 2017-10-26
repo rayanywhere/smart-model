@@ -1,21 +1,19 @@
+const assert = require('assert');
 const Command = require('../');
-module.exports = class extends Command {
-    constructor(helper, name, fields = undefined) {
-        super(helper, name);
-        if (fields !== undefined) {
-           this._validateFields(fields);
-        }
-        this._fields = fields;
-        this._logic = undefined;
-        this._range = undefined;
-        this._sorts = undefined;
-    }
+const Logic = require('../../logic');
 
-    where(logic) {
-        this._logic = logic;
+module.exports = class extends Command {
+    join(name, type, fieldLeft, fieldRight = undefined) {
+        this._join = {name, model: this._findModel(name), type, fieldLeft, fieldRight: fieldRight === undefined ? fieldLeft : fieldRight};
         return this;
     }
 
+    where(logic) {
+        assert(logic instanceof Logic, 'expect param to be an instance of Logic class');
+        this._logic = logic;
+        return this;
+    }
+    
     sort(field, order) {
         if (this._sorts === undefined) {
             this._sorts = [];
@@ -30,20 +28,48 @@ module.exports = class extends Command {
     }
 
     async run() {
-        let sql = 'SELECT ' + (this._fields === undefined ? '*' : this._fields.map(field => `\`${field}\``).join(',')) + ` FROM ${this._table}`;
-        let params = [];
-        if(this._logic !== undefined) {
-            sql += ' WHERE ' + this._logic.toSql();
-            params = params.concat(this._logic.toParams());
+        //step 1. prepare fields
+        let fields = [];
+        for (let field of Object.keys(this._model)) {
+            fields.push(`${this._name}.${field} as ${this._name}_${field}`);
         }
-        if (this._sorts !== undefined) {
-            sql += ' ORDER BY ' + this._sorts.map(sort => `\`${sort.field}\` ${sort.order}`).join(',');
-        }
-        if(this._range !== undefined) {
-            sql += ` LIMIT ?,?`;
-            params = params.concat([this._range.offset, this._range.number]);
+        if (this._join !== undefined) {
+            for (let field of Object.keys(this._join.model)) {
+                fields.push(`${this._join.name}.${field} as ${this._join.name}_${field}`);
+            }
         }
 
-        return await this._execute(sql, params);
+        //step 2. build & run query
+        this._sql = `SELECT ${fields.join(',')} FROM ${this._name}`;
+        if (this._join !== undefined) {
+            this._parseJoin(this._join);
+        }
+        if(this._logic !== undefined) {
+            this._parseLogic(this._logic);
+        }
+        if (this._sorts !== undefined) {
+            this._parseSorts(this._sorts);
+        }
+        if(this._range !== undefined) {
+            this._parseRange(this._range);
+        }
+
+        let rows = await this._execute();
+
+        //step 3. parse fields
+        return rows.map(row => {
+            let formattedRow = {};
+            for (let [rawfield, value] of Object.entries(row)) {
+                const parts = rawfield.match(/^(.+?)_([^_]+)$/);
+                assert(parts instanceof Array, 'internal error, cannot parse field');
+                const name = parts[1];
+                const field = parts[2];
+                if (formattedRow[name] === undefined) {
+                    formattedRow[name] = {};
+                }
+                formattedRow[name][field] = value;
+            };
+            return formattedRow;
+        });
     }
 }

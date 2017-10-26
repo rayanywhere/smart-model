@@ -3,7 +3,7 @@ const ajv = new Ajv();
 const Helper = require('../../lib/helper');
 
 module.exports = (param) => {
-    const helper = new Helper(param.environment, param.modelsDir, param.configDir); 
+    const helper = new Helper(param.modelsDir, param.configDir); 
     if (!ajv.validate({
         type: "object",
         properties: {
@@ -20,6 +20,9 @@ module.exports = (param) => {
     }
 
     helper.models.forEach(name => {
+        if (name.match(/^[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*$/) === null) {
+            throw new Error(`bad naming, model = ${name}`);
+        }
         const {current, obsolete} = helper.model(name);
         if (!diagnoseModel(current)) {
             throw new Error(`bad model ${name}, details: ${ajv.errorsText()}`);

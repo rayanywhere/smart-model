@@ -18,13 +18,6 @@ opts.parse([
 		required: true
 	},
 	{
-		short: 'e',
-		long: 'environment',
-		description: 'environment variable',
-		value: true,
-		required: true
-	},
-	{
 		short: 'a',
 		long: 'action',
 		description: 'action : diagnose|setup|upgrade',
@@ -35,8 +28,7 @@ opts.parse([
 
 const params = {
 	configDir: path.resolve(opts.get('config-dir')),
-	modelsDir: path.resolve(opts.get('models-dir')),
-	environment: opts.get('environment')
+	modelsDir: path.resolve(opts.get('models-dir'))
 };
 
 try {

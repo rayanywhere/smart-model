@@ -1,10 +1,16 @@
+const path = require('path');
+const fs = require('fs');
+const walk = require('klaw-sync');
+const assert = require('assert');
+
+const Command = require('./src/command');
 const Select = require('./src/command/select');
-const Count  = require('./src/command/count');
+const Count = require('./src/command/count');
 const Insert = require('./src/command/insert');
 const Update = require('./src/command/update');
 const Delete = require('./src/command/delete');
-const Helper = require('./lib/helper');
-let helper = undefined;
+
+const Logic = require('./src/logic');
 
 module.exports = class {
     static get Ops() {
@@ -28,27 +34,34 @@ module.exports = class {
         };
     }
 
-    static setup(environment, modelsDir, configDir) {
-        helper = new Helper(environment, modelsDir, configDir)
+    static setup(modelsDir, configDir) {
+        Command.config = require(path.resolve(configDir));
+        Command.models = walk(path.resolve(modelsDir), {
+            nodir: true,
+            filter: item => item.path.endsWith('.js') && !item.path.endsWith('.obsolete.js')
+        }).map(item => path.basename(item.path, '.js')).reduce((prev, curr) => {
+            prev[curr] = require(`${path.resolve(modelsDir)}/${curr}.js`);
+            return prev;
+        }, {});
     }
 
-    static select(name, fields) {
-        return new Select(helper, name, fields);
+    static select(name) {
+        return new Select(name);
     }
 
     static count(name) {
-        return new Count(helper, name);
+        return new Count(name);
     }
 
-    static insert(name, pairs) {
-        return new Insert(helper, name, pairs);
+    static insert(name) {
+        return new Insert(name);
     }
 
-    static update(name, pairs) {
-        return new Update(helper, name, pairs);
+    static update(name) {
+        return new Update(name);
     }
 
     static delete(name) {
-        return new Delete(helper, name);
+        return new Delete(name);
     }
 }

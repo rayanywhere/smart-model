@@ -42,10 +42,10 @@ function dropFieldSql(database, table, field, desc) {
 
 module.exports = async (param) => {
     try {
-        const helper = new Helper(param.environment, param.modelsDir, param.configDir);
+        const helper = new Helper(param.modelsDir, param.configDir);
         
         if (helper.config === undefined) {
-            throw new Error(`no config of environment(${param.environment})`);
+            throw new Error(`no config`);
         }
         const connection = await mysql.createConnection({
             host: helper.config.host,
@@ -62,13 +62,13 @@ module.exports = async (param) => {
             	let sqls = [];
 			    Object.entries(current).forEach(([field, desc]) => {
 			        if (obsolete[field] === undefined) {
-			            sqls.push(addFieldSql(helper.config.database, `t_${name.replace(/\./g, '_')}`, field, desc));
+			            sqls.push(addFieldSql(helper.config.database, name, field, desc));
 			            return;
 			        }
 			    });
 			    Object.entries(obsolete).forEach(([field, desc]) => {
 			        if (current[field] === undefined) {
-			            sqls.push(dropFieldSql(helper.config.database, `t_${name.replace(/\./g, '_')}`, field, desc));
+			            sqls.push(dropFieldSql(helper.config.database, name, field, desc));
 			            return;
 			        }
 			    });

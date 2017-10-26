@@ -1,33 +1,27 @@
+const assert = require('assert');
 const Command = require('../');
 module.exports = class extends Command {
-    constructor(helper, name) {
-        super(helper, name);
-        this._logic = undefined;
-        this._number = undefined;
-    }
-
     where(logic) {
+        assert(logic instanceof Logic, 'expect param to be an instance of Logic class');
         this._logic = logic;
         return this;
     }
 
     limit(number) {
-        this._number = number;
+        assert(Number.isInteger(number), 'expect param of limit function to be an integer');
+        this._limit = number;
         return this;
     }
 
     async run() {
-        let sql = `DELETE FROM ${this._table}`;
-        let params = [];
+        this._sql = `DELETE FROM ${this._name}`;
         if(this._logic !== undefined) {
-            sql += ' WHERE ' + this._logic.toSql();
-            params = params.concat(this._logic.toParams());
+            this._parseLogic(this._logic);
         }
-        if(this._number !== undefined) {
-            sql += ` LIMIT ?`;
-            params = params.concat(this._number);
+        if(this._limit !== undefined) {
+            this._parseLimit(this._limit);
         }
 
-        return await this._execute(sql, params);
+        return await this._execute();
     }
 }

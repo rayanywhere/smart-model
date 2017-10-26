@@ -12,7 +12,7 @@ class LogicStatement extends Logic {
     }
 
     toSql() {
-        return `(\`${this._field}\`${this._op}?)`;
+        return `(${this._field} ${this._op} ?)`;
     }
 
     toParams() {
