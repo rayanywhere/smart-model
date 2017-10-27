@@ -9,7 +9,7 @@ module.exports = class {
         this._name = name;
         this._data = undefined;
         this._logic = undefined;
-        this._join = undefined;
+        this._joins = [];
         this._sorts = undefined;
         this._range = undefined;
         this._limit = undefined;
@@ -39,16 +39,19 @@ module.exports = class {
         this._params = this._params.concat(Object.values(data));
     }
 
-    _parseJoin(join) {
-        switch(join.type.toLowerCase()) {
-            case 'left':
-            case 'right':
-            case 'inner':
-                this._sql += ` ${join.type.toUpperCase()} JOIN ${join.name} ON ${this._name}.${join.fieldLeft}=${join.name}.${join.fieldRight}`;
-                break;
-            default:
-                throw new Error(`unknown join type ${join.type}`);
-        }
+    _parseJoins(joins) {
+        joins.forEach(join => {
+            switch(join.type.toLowerCase()) {
+                case 'left':
+                case 'right':
+                case 'inner':
+                    this._sql += ` ${join.type.toUpperCase()} JOIN ?? ON ??=??`;
+                    this._params = this._params.concat([join.name, join.fieldLeft, join.fieldRight]);
+                    break;
+                default:
+                    throw new Error(`unknown join type ${join.type}`);
+            }
+        });        
     }
 
     _parseLogic(logic) {

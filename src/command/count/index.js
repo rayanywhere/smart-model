@@ -3,8 +3,8 @@ const Command = require('../');
 const Logic = require('../../logic');
 
 module.exports = class extends Command {
-    join(name, type, fieldLeft, fieldRight = undefined) {
-        this._join = {name, model: this._findModel(name), type, fieldLeft, fieldRight: fieldRight === undefined ? fieldLeft : fieldRight};
+    join(name, type, fieldLeft, fieldRight) {
+        this._joins.push({name, model: this._findModel(name), type, fieldLeft, fieldRight});
         return this;
     }
 
@@ -16,8 +16,8 @@ module.exports = class extends Command {
 
     async run() {
         this._sql = `SELECT count(*) as cnt FROM \`${this._name}\``;
-        if (this._join !== undefined) {
-            this._parseJoin(this._join);
+        if (this._joins.length > 0) {
+            this._parseJoins(this._joins);
         }
         if (this._logic !== undefined) {
             this._parseLogic(this._logic);

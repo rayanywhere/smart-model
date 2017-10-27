@@ -3,8 +3,8 @@ const Command = require('../');
 const Logic = require('../../logic');
 
 module.exports = class extends Command {
-    join(name, type, fieldLeft, fieldRight = undefined) {
-        this._join = {name, model: this._findModel(name), type, fieldLeft, fieldRight: fieldRight === undefined ? fieldLeft : fieldRight};
+    join(name, type, fieldLeft, fieldRight) {
+        this._joins.push({name, model: this._findModel(name), type, fieldLeft, fieldRight});
         return this;
     }
 
@@ -33,16 +33,16 @@ module.exports = class extends Command {
         for (let field of Object.keys(this._model)) {
             fields.push(`\`${this._name}\`.\`${field}\` as \`${this._name}^${field}\``);
         }
-        if (this._join !== undefined) {
-            for (let field of Object.keys(this._join.model)) {
-                fields.push(`\`${this._join.name}\`.\`${field}\` as \`${this._join.name}^${field}\``);
+        this._joins.forEach(join => {
+            for (let field of Object.keys(join.model)) {
+                fields.push(`\`${join.name}\`.\`${field}\` as \`${join.name}^${field}\``);
             }
-        }
+        });
 
         //step 2. build & run query
         this._sql = `SELECT ${fields.join(',')} FROM \`${this._name}\``;
-        if (this._join !== undefined) {
-            this._parseJoin(this._join);
+        if (this._joins.length > 0) {
+            this._parseJoins(this._joins);
         }
         if(this._logic !== undefined) {
             this._parseLogic(this._logic);
